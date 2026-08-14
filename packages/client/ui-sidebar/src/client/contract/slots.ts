@@ -23,6 +23,12 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
      */
     'sidebar.workspaces': { kind: 'single'; scope: 'root'; owner: SidebarSectionOwnerProps }
     /**
+     * Optional surface ABOVE the workspaces region. Declared by this package's
+     * 'sidebar' entry; a plugin registers a card here (ui-token-viewer's
+     * aggregate token consumption). Receives only the column state.
+     */
+    'sidebar.workspaces.header': { kind: 'single'; scope: 'root'; owner: SidebarSectionHeaderOwnerProps }
+    /**
      * The settings seat at the sidebar foot. Declared by this package's
      * 'sidebar' entry; ui-settings registers its trigger row + modal panel.
      * The sidebar passes only its column state — it holds no settings state.
@@ -45,6 +51,15 @@ export interface SidebarSectionOwnerProps {
   wide: boolean
   /** Rail icons request expansion; the browser rides the wide flip for focus. */
   expandSidebar: () => void
+}
+
+/**
+ * Owner share of the header hole above the workspaces region: the column
+ * display state only (the card hides in the rail).
+ */
+export interface SidebarSectionHeaderOwnerProps {
+  /** Whether the sidebar renders wide content (false = 56px rail). */
+  wide: boolean
 }
 
 /**
@@ -85,5 +100,5 @@ export type SidebarRootInjected = {
  */
 export type SidebarRootComponentProps =
   PropsRuntime<'sidebar'>
-  & PropsRenderSlots<'sidebar.workspaces' | 'sidebar.settings' | 'sidebar.footer.action'>
+  & PropsRenderSlots<'sidebar.workspaces' | 'sidebar.workspaces.header' | 'sidebar.settings' | 'sidebar.footer.action'>
   & SidebarRootInjected & PropsLocale<'sidebar'>

@@ -241,6 +241,11 @@
     - id: ui-goal
       name: '@deepseek-ai/dsh-client-ui-goal'
 
+    # Token consumption: the composer-dock strip plus the sidebar card above
+    # the workspaces region, over the token-meter session projections.
+    - id: ui-token-viewer
+      name: '@deepseek-ai/dsh-client-ui-token-viewer'
+
     # Per-message feedback: Like/Dislike plus an optional note in the
     # assistant-message action strip, over the messageFeedback Remote.
     - id: ui-message-feedback

@@ -169,9 +169,10 @@ export function SidebarRoot({
         </button>
       </Tooltip>
 
-      {/* The browsing region fills the column between the controls and the
-          foot in both states; its rail icon column rides the same slot. */}
+      {/* Optional surfaces (ui-token-viewer's token card) render above the
+          browsing region in the wide column; the rail shows neither. */}
       <div className={css.regionArea}>
+        {renderSlot('sidebar.workspaces.header', { wide })}
         {renderSlot('sidebar.workspaces', {
           wide,
           expandSidebar: () => { if (collapsed) toggleSidebar() },

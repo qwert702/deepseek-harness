@@ -43,9 +43,12 @@ export function apply(ctx: ClientContext): void {
       locale: NS,
       // The shell owns geometry; ui-workspace registers the whole browsing
       // region (header, search, session list, workspace dialogs), ui-settings
-      // registers the foot trigger + settings panel.
+      // registers the foot trigger + settings panel, and optional surfaces
+      // above the browsing region (ui-token-viewer's token card) ride the
+      // sidebar.workspaces.header hole.
       children: {
         'sidebar.workspaces': { kind: 'single', scope: 'root' },
+        'sidebar.workspaces.header': { kind: 'single', scope: 'root' },
         'sidebar.settings': { kind: 'single', scope: 'root' },
         'sidebar.footer.action': { kind: 'list', scope: 'root' },
       },
