@@ -2,16 +2,17 @@
 
 English | [中文](README.zh.md)
 
-Token consumption surface plugin, browser half: two read-only surfaces over the host-computed token-meter session projections (`tokenUsage`, `contextPressure`, `contextBreakdown`), so the plugin owns no domain store, refresh chain, or event listener.
+Token consumption surface plugin: read-only surfaces over the host-computed token-meter session projections (`tokenUsage`, `contextPressure`, `contextBreakdown`) plus a DeepSeek account-balance read. The browser half owns no domain store, refresh chain, or event listener; the node half owns the one host route the balance row fetches.
 
 - **`TokenDock`** registers at `conversation.input.dock` (order 20, after Goal). It shows what the current session has consumed — billed input (uncached + cache read + cache write), output, cache hit rate, and approximate context occupancy (`projectedTokens / contextWindow`) with a mini progress bar. The hover tooltip carries the full billing breakdown. It renders nothing until a provider reports usage.
-- **`SidebarTokenPanel`** registers at `sidebar.workspaces.header`, a hole declared by ui-sidebar's shell above the workspaces region. It aggregates `tokenUsage` across every session row's `projectionValues` — billed input, output, cache hit rate, and the number of sessions that reported usage — so it is a whole-instance total rather than a per-session read. It renders nothing until a session reports usage, and nothing in the collapsed rail (`wide === false`).
+- **`SidebarTokenPanel`** registers at `sidebar.workspaces.header`, a hole declared by ui-sidebar's shell above the workspaces region. It shows the DeepSeek account balance (currency figure with a refresh control; error-retry when the host proxy fails), aggregates `tokenUsage` across every session row's `projectionValues` — billed input, output, cache hit rate, and the number of sessions that reported usage — and expands to a per-conversation list (each session's billed input/output, highest total first; clicking a row opens that session). It renders nothing until balance or usage is available, and nothing in the collapsed rail (`wide === false`).
+- **Host half** registers `GET /api/billing/balance`: it reads its configuration from the harness **settings namespace** `dsh-token-viewer` (which credential reference and provider base URL to use, defaults `DEEPSEEK_API_KEY` / `https://api.deepseek.com`, editable in `settings.yaml`), resolves the API key through the credentials service (the same secret store the LLM adapter uses), and proxies DeepSeek's `/user/balance`, returning only balance figures — the API key never leaves the server.
 
 The `/client` exports are the plugin body (`apply`/`inject`) and the composed props types.
 
 ## Model Experience
 
-None. The surfaces are pure presentation over projection values already computed by the host; they add no prompt content, tools, messages, or provider requests.
+None. The surfaces are pure presentation over projection values already computed by the host, plus a balance read from the provider's billing endpoint; the plugin adds no prompt content, tools, messages, or provider requests.
 
 #### KV Cache effect
 
@@ -20,4 +21,5 @@ None. The plugin neither assembles nor sends provider requests.
 ## Known Limitations and Deferred Work
 
 - **Heuristic approximations** — cache hit rate and context occupancy inherit the token-meter's fixed 4-chars-per-token density estimate for any content the provider did not bill; CJK text and JSON schemas are systematically underpriced. Occupancy is a user-facing reference figure, not a billing or gating input (see the token-meter README).
+- **Balance is DeepSeek-specific** — the host route calls DeepSeek's `/user/balance`; other providers are not covered, and multi-currency responses show only the first `balance_infos` entry.
 - **The sidebar card depends on ui-sidebar's header hole** — it renders only when the shell declares `sidebar.workspaces.header`; a composition that replaces ui-sidebar without that hole silently loses the card while the dock strip keeps working.
