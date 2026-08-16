@@ -33,3 +33,5 @@ ui-sidebar 的改动是增量且最小的：一个子插槽声明（`kind: 'sing
 ## 后果
 
 用户无需离开 GUI 即可看到实时会话级与整实例级 token 消耗，且数据与压缩、占用率展示使用的 host 计算口径一致，另加提供方计费端点的账号余额。web profile 增加一行 `dsh.client` 与一个依赖；合并后需重新生成 `pnpm-lock.yaml`。包纯展示：不添加提示词内容、工具、消息或提供方请求，因此无模型或 KV 缓存影响（余额路由是服务端 fetch，不是模型调用）。余额为 DeepSeek 专属——路由调用 DeepSeek 的 `/user/balance`，且只展示 `balance_infos` 首项。侧边栏卡片依赖 header 插槽；若组合层替换了不带该插槽的 ui-sidebar，卡片会静默消失，而 dock 条仍正常（已记入 Known Limitations）。
+
+详情面板的模型统计折叠 host 侧 `modelUsage` 会话投影：对 `assistant/message` 事件，把每一步的提供方用量归到该消息的模型（`message.source.model`），浏览器半区把各会话的投影值聚合成按模型行（会话数、输入/输出/缓存、估算费用）。这是纯事件折叠，无模型或 KV 缓存影响；在有任何会话上报之前，面板显示一行部署默认模型（来自 `agent-default-model` 设置命名空间的客户端 `settingsScope` 读取，回退 `deepseek-v4-flash`）。
